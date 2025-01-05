@@ -10,36 +10,66 @@ const getBookById = async (id) => {
 };
 
 const addBook = async (book) => {
-    return await prisma.book.create({
-      data: {
-        title: book.title,
-        author: book.author,
-        genre: book.genre,
-        publishedYear: book.publishedYear, // Corrected field name
-        isbn: book.isbn,
-        imageUrl: book.imageUrl, // Corrected field name
-        // Add other fields if necessary
-      }
-    });
-  };
+  return await prisma.book.create({
+    data: {
+      title: book.title,
+      author: book.author,
+      genre: book.genre,
+      publishedYear: book.publishedYear,
+      isbn: book.isbn,
+      imageUrl: book.imageUrl,
+      isAvailable: book.isAvailable,
+    },
+  });
+};
 
-  const updateBook = async (id, book) => {
-    return await prisma.book.update({
-      where: { id: parseInt(id) },
-      data: {
-        title: book.title,
-        author: book.author,
-        genre: book.genre,
-        publishedYear: book.publishedYear,
-        isbn: book.isbn,
-        imageUrl: book.imageUrl,
-        isAvailable: book.isAvailable
-      }
-    });
-  };
+const updateBook = async (id, book) => {
+  return await prisma.book.update({
+    where: { id: parseInt(id) },
+    data: {
+      title: book.title,
+      author: book.author,
+      genre: book.genre,
+      publishedYear: book.publishedYear,
+      isbn: book.isbn,
+      imageUrl: book.imageUrl,
+      isAvailable: book.isAvailable,
+    },
+  });
+};
 
 const deleteBook = async (id) => {
   return await prisma.book.delete({ where: { id: parseInt(id) } });
 };
 
-module.exports = { getBooks, getBookById, addBook, updateBook, deleteBook };
+const borrowBook = async (id, userId) => {
+  return await prisma.book.update({
+    where: { id: parseInt(id) },
+    data: {
+      isAvailable: false,
+      borrowedBy: userId,
+      borrowedAt: new Date(),
+    },
+  });
+};
+
+const returnBook = async (id) => {
+  return await prisma.book.update({
+    where: { id: parseInt(id) },
+    data: {
+      isAvailable: true,
+      borrowedBy: null,
+      borrowedAt: null,
+    },
+  });
+};
+
+module.exports = {
+  getBooks,
+  getBookById,
+  addBook,
+  updateBook,
+  deleteBook,
+  borrowBook,
+  returnBook,
+};
